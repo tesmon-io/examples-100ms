@@ -1,0 +1,63 @@
+actions:
+  create-room:
+    type: HTTP::CLIENT
+    props:
+      method: POST
+      baseUrl: https://api.100ms.live
+      path: /v2/rooms
+      headers:
+        Authorization: Bearer ${{variables.managementToken}}
+        Content-Type: application/json
+      body: |-
+        {
+            "name": "new-room-1662723668",
+            "description": "This is a sample description for the room",
+            "template_id": "${{variables.templateId}}"
+        }
+  get-rooms:
+    type: HTTP::CLIENT
+    props:
+      method: GET
+      baseUrl: https://api.100ms.live
+      path: /v2/rooms
+      headers:
+        Authorization: Bearer ${{variables.managementToken}}
+  retrieve-room:
+    type: HTTP::CLIENT
+    props:
+      method: GET
+      baseUrl: https://api.100ms.live
+      path: /v2/rooms/${{context.last_output.body.id}}
+      headers:
+        Authorization: Bearer ${{variables.managementToken}}
+  disable-room:
+    type: HTTP::CLIENT
+    props:
+      method: POST
+      baseUrl: https://api.100ms.live
+      path: /v2/rooms/${{context.last_output.body.id}}
+      headers:
+        Authorization: Bearer ${{variables.managementToken}}
+        Content-Type: application/json
+      body: |-
+        {
+            "enabled": false
+        }
+variables:
+  managementToken: xxxxx
+  templateId: 639234e674131f3531bb164d
+tests:
+  tests-1718714127:
+    testbot: true
+    summary: >-
+      This test performs a GET request to retrieve a list of rooms from the API,
+      which returns a status code of 200. It then sends a POST request to create
+      a new room with specific details, also receiving a 200 status code.
+      Finally, another GET request is made to fetch details of a specific room
+      using the ID from the previous request, again returning a status code of
+      200.
+    tasks:
+      - action: actions.get-rooms
+      - action: actions.create-room
+      - action: actions.retrieve-room
+      - action: actions.disable-room
